@@ -48,3 +48,6 @@ source ./scripts/train_mvmwm_viewpoint_robust.sh {TASK} {USE_ROTATION} {DIFFICUL
 source ./scripts/train_mvmwm_viewpoint_robust.sh rlbench_phone_on_base_custom False medium 0 1
 source ./scripts/train_mvmwm_viewpoint_robust.sh rlbench_stack_wine_custom True weak 0 1
 ```
+
+## Note
+This code might not perfectly reproduce the results in the paper, possible due to the human errors in preparing and cleaning the code for release. Please let us know if you have any problem or trouble in reproducing our results. We will also try to conduct sanity-check experiments as soon as possible.
