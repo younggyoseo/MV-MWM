@@ -10,7 +10,7 @@ python mvmwm/train.py \
 --control_input front \
 --task ${TASK} \
 --mae.view_masking 0 \
---mae.viewpoint_pos_emb True \
+--mae.viewpoint_pos_emb False \
 --steps 302000 \
 --num_demos 50 \
 --use_rotation ${USE_ROTATION} \
