@@ -1,0 +1,167 @@
+defaults:
+
+  # Train Script
+  logdir: /dev/null
+  loaddir: none
+  seed: 0
+  task: rlbench_reach_target
+  envs: 8
+  eval_envs: 8
+  envs_parallel: process
+  render_size: [96, 96]
+  time_limit: 150
+  steps: 502000
+  log_every: 1e3
+  eval_every: 1e4
+  save_every: 1e4
+  eval_eps: 24
+  prefill: 0
+  pretrain: 1000
+  mae_pretrain: 10000
+  train_every: 16
+  train_mae_every: 16
+  train_steps: 1
+  train_mae_steps: 1
+  replay: {capacity: 2e6, minlen: 1, maxlen: 50, prioritize_ends: True, load_minlen: 50}
+  eval_replay: {capacity: 2e6, minlen: 1, maxlen: 50, prioritize_ends: True}
+  dataset: {batch: 36, length: 50}
+  demo_dataset: {batch: 12, length: 50}
+  mae_dataset: {batch: 32, length: 32}
+  log_keys_video: ['image']
+  log_keys_sum: '^$'
+  log_keys_mean: '^$'
+  log_keys_max: '^$'
+  precision: 16
+  jit: True
+  action_repeat: 1
+  augment: False
+
+  # Noises
+  eval_noise: 0.0
+  expl_noise: 0.0
+
+  # Env
+  use_rotation: False
+  shaped_rewards: True
+  num_demos: 100
+  use_randomize: False
+  default_texture: default
+
+  # Cameras
+  camera_keys: 'front|wrist'
+  control_input: 'front|wrist'
+
+  # MAE
+  mask_ratio: 0.9
+  mae: {img_h_size: 96, img_w_size: 96, patch_size: 16, embed_dim: 256, depth: 8, num_heads: 4, decoder_embed_dim: 256, decoder_depth: 6, decoder_num_heads: 4, reward_pred: True, early_conv: True, in_chans: 3, ncams: 0, view_masking: 1, viewpoint_pos_emb: True}
+  wm_flat_vit: {img_h_size: 6, img_w_size: 6, patch_size: 1, embed_dim: 128, depth: 2, num_heads: 4, decoder_embed_dim: 128, decoder_depth: 2, decoder_num_heads: 4, in_chans: 256}
+  image_t_size: 4
+  # theta_low | theta_high | phi_low | phi_high | theta_delta | phi_delta | radius_low | radius_high | height_low | height_high | radius_delta | height_delta; All zeros means no camera
+  additional_cams: {
+    "cam1": { theta: ["none"], phi: ["none"], radius: ["none"], height: ["none"], axis: ["none"], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.},
+    "cam2": { theta: ["none"], phi: ["none"], radius: ["none"], height: ["none"], axis: ["none"], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.},
+    "cam3": { theta: ["none"], phi: ["none"], radius: ["none"], height: ["none"], axis: ["none"], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.},
+  }
+  eval_cams: {
+    "cam11": { theta: ["none"], phi: ["none"], radius: ["none"], height: ["none"], axis: ["none"], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.},
+    "cam12": { theta: ["none"], phi: ["none"], radius: ["none"], height: ["none"], axis: ["none"], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.},
+    "cam13": { theta: ["none"], phi: ["none"], radius: ["none"], height: ["none"], axis: ["none"], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.},
+  }
+
+  # World Model
+  clip_rewards: identity
+  grad_heads: [reward, discount]
+  pred_discount: True
+  rssm: {action_free: False, hidden: 1024, deter: 1024, stoch: 32, discrete: 32, act: elu, norm: none, std_act: sigmoid2, min_std: 0.1}
+  reward_head: {layers: [512, 512, 512, 512], act: elu, norm: none, dist: symlog}
+  discount_head: {layers: [512, 512, 512, 512], act: elu, norm: none, dist: binary}
+  loss_scales: {feature: 1.0, kl: 1.0, reward: 1.0, discount: 1.0, proprio: 1.0, mae_reward: 1.0, wmbc: 1.0}
+  wmkl: {scale: 1.0}
+  wmkl_minloss: 0.1
+  wmkl_balance: 0.8
+  model_opt: {opt: adam, lr: 3e-4, eps: 1e-5, clip: 100.0, wd: 1e-6, wd_pattern: 'kernel', warmup: 0}
+  mae_opt: {opt: adam, lr: 3e-4, eps: 1e-5, clip: 100.0, wd: 1e-6, warmup: 2500}
+
+  # Actor Critic
+  actor: {layers: [512, 512, 512, 512], act: elu, norm: none, dist: trunc_normal, min_std: 0.1}
+  critic: {layers: [512, 512, 512, 512], act: elu, norm: none, dist: mse}
+  actor_opt: {opt: adam, lr: 1e-4, eps: 1e-5, clip: 100.0, wd: 1e-6, wd_pattern: 'kernel', warmup: 0}
+  critic_opt: {opt: adam, lr: 1e-4, eps: 1e-5, clip: 100.0, wd: 1e-6, wd_pattern: 'kernel', warmup: 0}
+  discount: 0.99
+  discount_lambda: 0.95
+  imag_horizon: 15
+  actor_grad: dynamics
+  actor_grad_mix: 0.1
+  aent: {scale: 1e-4}
+  slow_target: True
+  slow_target_update: 100
+  slow_target_fraction: 1
+  slow_baseline: True
+  reward_norm: {momentum: 0.99, scale: 1.0, eps: 1e-8}
+  
+  # Behavior Cloning
+  demo_bc: True
+  bc_weight: 1.0
+
+front:
+  camera_keys: front
+  control_input: front
+
+wrist:
+  camera_keys: wrist
+  control_input: wrist
+
+front_wrist:
+  camera_keys: front|wrist
+  control_input: front|wrist
+
+front_wrist_to_front:
+  camera_keys: front|wrist
+  control_input: front
+
+front_wrist_to_wrist:
+  camera_keys: wrist|front
+  control_input: wrist
+
+# Note: "range1_low|range1_high" "range2_low|range2_high" ...
+# Note: parameters are sampled from [range1_low, range2_high] U [range2_low, range2_high] U ...
+# Note: delta means per-step changes (used for per-step rotating experiments)
+weak:
+  additional_cams.cam1: { theta: [ "-5.|5." ], phi: [ "26|28" ], radius: [ "1.25|1.45" ], height: [ "1.5|1.7" ], axis: [ "-5.|5." ], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0., }
+
+multiview_weak:
+  additional_cams.cam1: { theta: [ "-5.|5." ], phi: [ "26|28" ], radius: [ "1.25|1.45" ], height: [ "1.5|1.7" ], axis: [ "-5.|5." ], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0., }
+  additional_cams.cam2: { theta: [ "-5.|5." ], phi: [ "26|28" ], radius: [ "1.25|1.45" ], height: [ "1.5|1.7" ], axis: [ "-5.|5." ], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0., }
+
+medium:
+  additional_cams.cam1: { theta: [ "-7.5|7.5" ], phi: [ "25.5|28.5" ], radius: [ "1.2|1.5" ], height: [ "1.45|1.75" ], axis: [ "-7.5|7.5" ], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.,}
+
+multiview_medium:
+  additional_cams.cam1: { theta: [ "-7.5|7.5" ], phi: [ "25.5|28.5" ], radius: [ "1.2|1.5" ], height: [ "1.45|1.75" ], axis: [ "-7.5|7.5" ], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.,}
+  additional_cams.cam2: { theta: [ "-7.5|7.5" ], phi: [ "25.5|28.5" ], radius: [ "1.2|1.5" ], height: [ "1.45|1.75" ], axis: [ "-7.5|7.5" ], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.,}
+
+eval_strong:
+  eval_cams.cam11: { theta: [ "-10.|-7.5", "7.5|10." ], phi: [ "25|25.5", "28.5|29" ], radius: [ "1.15|1.2", "1.5|1.55" ], height: [ "1.4|1.45", "1.75|1.8" ], axis: [ "-10.|-7.5", "7.5|10." ], delta_theta: 0., delta_phi: 0., delta_radius: 0., delta_height: 0., delta_axis: 0.,}
+
+debug:
+  envs: 1
+  eval_envs: 1
+  eval_eps: 1
+  dataset.batch: 8
+  dataset.length: 10
+  demo_dataset.batch: 2
+  demo_dataset.length: 10
+  mae_dataset.batch: 4
+  mae_dataset.length: 8
+  mae.depth: 1
+  mae.decoder_depth: 1
+  pretrain: 1
+  mae_pretrain: 1
+  num_demos: 1
+  rssm.hidden: 64
+  rssm.deter: 64
+  rssm.stoch: 4
+  rssm.discrete: 4
+  imag_horizon: 3
+  jit: False
+  log_every: 100
