@@ -103,20 +103,25 @@ class MaskedViTEncoder(common.Module):
                         )
 
                         cond_noise = tf.random.uniform([N, 1])
-                        cond = cond_noise > 0.5
 
                         if i != 0:
                             num_masked_views = tf.reduce_sum(
                                 tf.concat(conds, 1), 1, keepdims=True
                             )
-                            all_views_masked = num_masked_views == self.view_masking
+                            views_masked = num_masked_views == self.view_masking
+                            num_remained_masked_views = self.view_masking - num_masked_views
+                            must_mask = num_remained_masked_views == ncams - i
+
                             # if specified number of views are already masked,
                             # let's set view_mask = False
                             # e.g., view_masked = True if N views are already masked
                             # Then cond (=view masking) will be set to False
-                            cond = ~all_views_masked & cond
-
-                        not_cond = ~cond
+                            # cond = ~views_masked & (cond_noise > 0.5) & must_mask
+                            cond = ~views_masked & (must_mask | (~must_mask & (cond_noise > 0.5)))
+                            not_cond = ~cond
+                        else:
+                            cond = cond_noise > 0.5
+                            not_cond = ~cond
 
                         noise = (
                             tf.cast(cond, uniform_noise.dtype) * view_noise
